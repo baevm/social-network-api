@@ -1,0 +1,640 @@
+basePath: /v1
+definitions:
+  auth.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  auth.LoginResponse:
+    properties:
+      auth_token:
+        $ref: '#/definitions/password.AuthToken'
+    type: object
+  auth.SignupRequest:
+    properties:
+      email:
+        type: string
+      firstname:
+        type: string
+      lastname:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - firstname
+    - lastname
+    - password
+    - username
+    type: object
+  auth.SignupResponse:
+    properties:
+      message:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.Media:
+    properties:
+      id:
+        type: integer
+      url:
+        type: string
+    type: object
+  models.Post:
+    properties:
+      body:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      media:
+        items:
+          $ref: '#/definitions/models.Media'
+        type: array
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
+  models.User:
+    properties:
+      activated:
+        type: boolean
+      avatar:
+        type: string
+      birthdate:
+        example: "2006-01-02"
+        format: date
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      username:
+        type: string
+    type: object
+  password.AuthToken:
+    properties:
+      expiry:
+        type: string
+      token:
+        type: string
+    type: object
+  payload.HTTPError:
+    properties:
+      code:
+        example: 400
+        type: integer
+      error:
+        example: status bad request
+        type: string
+    type: object
+  payload.HTTPSuccess:
+    properties:
+      data: {}
+    type: object
+  posts.CommentRequest:
+    properties:
+      body:
+        maxLength: 1000
+        minLength: 1
+        type: string
+    required:
+    - body
+    type: object
+  users.UserResponse:
+    properties:
+      avatar:
+        type: string
+      birthdate:
+        example: "2006-01-02"
+        format: date
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:5000
+info:
+  contact: {}
+  description: Twitter like api made with golang.
+  title: Social network API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: authenticate and get token
+      parameters:
+      - description: Login
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            auth_token string:
+              type: string
+          schema:
+            $ref: '#/definitions/auth.LoginResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+      summary: User authentication
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: logout user and delete token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/payload.HTTPSuccess'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+      summary: User logout
+      tags:
+      - auth
+  /auth/signup:
+    post:
+      consumes:
+      - application/json
+      description: signup user
+      parameters:
+      - description: Signup
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/auth.SignupRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/auth.SignupResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+      summary: User signup
+      tags:
+      - auth
+  /feed:
+    get:
+      consumes:
+      - application/json
+      description: get feed of authorized user (own posts and people you follow) with
+        pagination
+      parameters:
+      - default: Bearer token
+        description: auth_token
+        in: header
+        name: Cookie
+        required: true
+        type: string
+      - description: page
+        in: query
+        name: id
+        type: string
+      - description: limit
+        in: query
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            items:
+              $ref: '#/definitions/models.Post'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+      summary: Get feed of authorized user
+      tags:
+      - feed
+  /follow/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Unfollow user with user_id to unfollow provided in path.
+      parameters:
+      - description: id of user to follow
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            auth_token string:
+              type: string
+          schema:
+            $ref: '#/definitions/payload.HTTPSuccess'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+      summary: Unfollow user
+      tags:
+      - follow
+    post:
+      consumes:
+      - application/json
+      description: Follow user with user_id to follow provided in path.
+      parameters:
+      - description: id of user to follow
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            auth_token string:
+              type: string
+          schema:
+            $ref: '#/definitions/payload.HTTPSuccess'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+      summary: Follow user
+      tags:
+      - follow
+  /posts:
+    post:
+      consumes:
+      - multipart/form-data
+      description: create post
+      parameters:
+      - default: Bearer token
+        description: auth_token
+        in: header
+        name: Cookie
+        required: true
+        type: string
+      - description: image files
+        in: formData
+        name: images
+        required: true
+        type: file
+      - description: post body text
+        in: formData
+        name: body
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/payload.HTTPSuccess'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+      summary: Create post
+      tags:
+      - posts
+  /posts/{id}:
+    delete:
+      description: delete post
+      parameters:
+      - default: Bearer token
+        description: auth_token
+        in: header
+        name: Cookie
+        required: true
+        type: string
+      - description: post id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/payload.HTTPSuccess'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+      summary: Delete post
+      tags:
+      - posts
+  /posts/{id}/comment:
+    post:
+      description: Create comment on post
+      parameters:
+      - default: Bearer token
+        description: auth_token
+        in: header
+        name: Cookie
+        required: true
+        type: string
+      - description: post id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/posts.CommentRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/payload.HTTPSuccess'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+      summary: Create comment
+      tags:
+      - posts
+  /posts/{id}/comment/{comment_id}:
+    delete:
+      description: Remove comment from post
+      parameters:
+      - default: Bearer token
+        description: auth_token
+        in: header
+        name: Cookie
+        required: true
+        type: string
+      - description: post id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/payload.HTTPSuccess'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+      summary: Remove comment
+      tags:
+      - posts
+  /posts/{id}/like:
+    delete:
+      description: Remove like from post
+      parameters:
+      - default: Bearer token
+        description: auth_token
+        in: header
+        name: Cookie
+        required: true
+        type: string
+      - description: post id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/payload.HTTPSuccess'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+      summary: Remove like
+      tags:
+      - posts
+    post:
+      description: like post
+      parameters:
+      - default: Bearer token
+        description: auth_token
+        in: header
+        name: Cookie
+        required: true
+        type: string
+      - description: post id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/payload.HTTPSuccess'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+      summary: Like post
+      tags:
+      - posts
+  /user/{username}:
+    get:
+      description: get user profile
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/users.UserResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+      summary: Get user profile
+      tags:
+      - users
+  /user/me:
+    get:
+      description: used to get authorized user
+      parameters:
+      - default: Bearer token
+        description: auth_token
+        in: header
+        name: Cookie
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.User'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/payload.HTTPError'
+      summary: Get authorized user
+      tags:
+      - users
+swagger: "2.0"
