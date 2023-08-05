@@ -56,7 +56,7 @@ func (s *service) CreatePost(ctx context.Context, files []*multipart.FileHeader,
 	post := &models.Post{
 		Body:   body,
 		Images: media,
-		User: &models.User{
+		User: models.User{
 			Id: userId,
 		},
 	}

@@ -2,6 +2,7 @@ package http
 
 import (
 	"social-network-api/internal/api/auth"
+	"social-network-api/internal/api/feed"
 	"social-network-api/internal/api/followers"
 	"social-network-api/internal/api/posts"
 	"social-network-api/internal/api/users"
@@ -20,6 +21,7 @@ func (s *Server) setHTTPRouter() *gin.Engine {
 	usersHandler := users.New(s.logger, s.db, s.cache)
 	postsHandler := posts.New(s.logger, s.db, s.cache)
 	followHandler := followers.New(s.logger, s.db, s.cache)
+	feedHandler := feed.New(s.logger, s.db, s.cache)
 
 	v1 := router.Group("/v1")
 	{
@@ -57,6 +59,13 @@ func (s *Server) setHTTPRouter() *gin.Engine {
 		follows.Use(s.AuthSession())
 		follows.POST("/:id", followHandler.Follow())
 		follows.DELETE("/:id", followHandler.Unfollow())
+	}
+
+	{
+		// Feed
+		feed := v1.Group("/feed")
+		feed.Use(s.AuthSession())
+		feed.GET("/", feedHandler.GetFeed())
 	}
 
 	return router

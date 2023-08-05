@@ -154,7 +154,7 @@ func (r *Repo) RemoveComment(ctx context.Context, postId int64, commentId int64,
 func (r *Repo) GetFeed(ctx context.Context, userId int64, limit int64, offset int64) ([]*models.Post, error) {
 	// sql query feed of own posts and people you follow
 	query := `
-	SELECT p.id, p.user_id, p.body, p.created_at, u.username, coalesce(u.avatar, ''), pi.url
+	SELECT p.id, p.user_id, p.body, p.created_at, u.username, coalesce(u.avatar, '') as user_avatar, coalesce(pi.url, '') as image_url
 	FROM posts p
 	INNER JOIN users u ON u.id = p.user_id
 	LEFT JOIN post_images pi ON pi.post_id = p.id
@@ -184,7 +184,11 @@ func (r *Repo) GetFeed(ctx context.Context, userId int64, limit int64, offset in
 	var posts []*models.Post
 
 	for rows.Next() {
-		var post models.Post
+		post := &models.Post{
+			User: models.User{},
+		}
+
+		media := models.Media{}
 
 		err := rows.Scan(
 			&post.Id,
@@ -193,14 +197,16 @@ func (r *Repo) GetFeed(ctx context.Context, userId int64, limit int64, offset in
 			&post.Created_at,
 			&post.User.Username,
 			&post.User.Avatar,
-			&post.Images,
+			&media.Url,
 		)
 
 		if err != nil {
 			return nil, err
 		}
 
-		posts = append(posts, &post)
+		post.Images = append(post.Images, media)
+
+		posts = append(posts, post)
 	}
 
 	if rows.Err() != nil {

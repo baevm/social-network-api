@@ -10,8 +10,8 @@ import (
 )
 
 type CreatePostRequest struct {
-	Body   string                  `form:"body" binding:"required"`
-	Images []*multipart.FileHeader `form:"images" binding:"required"`
+	Body   string                  `form:"body" binding:"required,min=1,max=1000"`
+	Images []*multipart.FileHeader `form:"images" binding:"omitempty"`
 }
 
 // CreatePost godoc
@@ -33,6 +33,7 @@ func (h *handler) CreatePost() gin.HandlerFunc {
 		var req CreatePostRequest
 
 		if err := c.ShouldBind(&req); err != nil {
+			h.logger.Info(err)
 			h.payload.BadRequest(c, err)
 			return
 		}

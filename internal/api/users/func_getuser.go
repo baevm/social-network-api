@@ -57,7 +57,7 @@ func (h *handler) GetUser() gin.HandlerFunc {
 			Lastname:  user.Lastname,
 			Username:  user.Username,
 			Avatar:    user.Avatar,
-			Birthdate: user.Birthdate,
+			Birthdate: *user.Birthdate,
 		}
 
 		h.payload.WriteJSON(c, 200, userResponse)
