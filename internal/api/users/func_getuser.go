@@ -7,16 +7,14 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type UserResponse struct {
-	Id        int64       `json:"id"`
-	Firstname string      `json:"first_name"`
-	Lastname  string      `json:"last_name"`
-	Username  string      `json:"username"`
-	Avatar    string      `json:"avatar"`
-	Birthdate pgtype.Date `json:"birthdate" swaggertype:"string" format:"date" example:"2006-01-02"`
+	Id        int64  `json:"id"`
+	Firstname string `json:"first_name"`
+	Lastname  string `json:"last_name"`
+	Username  string `json:"username"`
+	Avatar    string `json:"avatar"`
 }
 
 // GetUser godoc
@@ -57,7 +55,6 @@ func (h *handler) GetUser() gin.HandlerFunc {
 			Lastname:  user.Lastname,
 			Username:  user.Username,
 			Avatar:    user.Avatar,
-			Birthdate: *user.Birthdate,
 		}
 
 		h.payload.WriteJSON(c, 200, userResponse)

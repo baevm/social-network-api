@@ -77,3 +77,11 @@ db/migration:
 .PHONY: swagger
 swagger:
 	swag init -g cmd/api/main.go
+
+
+#=============================================================================
+#========================== DEPLOY ===========================================
+#=============================================================================
+.PHONY: compose
+compose:
+	docker compose -f ./deploy/docker-compose.yml --env-file ./.env up

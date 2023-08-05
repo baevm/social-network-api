@@ -138,7 +138,7 @@ func (r Repo) GetByUsername(ctx context.Context, username string) (*models.User,
 	var user models.User
 
 	query := `
-	SELECT id, first_name, last_name, username, coalesce(avatar, ''), birthdate
+	SELECT id, first_name, last_name, username, coalesce(avatar, '')
 	FROM users
 	WHERE username = $1`
 
@@ -150,7 +150,6 @@ func (r Repo) GetByUsername(ctx context.Context, username string) (*models.User,
 			&user.Lastname,
 			&user.Username,
 			&user.Avatar,
-			&user.Birthdate,
 		)
 
 	if err != nil {

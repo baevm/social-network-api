@@ -14,7 +14,7 @@ func (s *Server) setHTTPRouter() *gin.Engine {
 	router := gin.New()
 
 	router.Use(gin.Recovery())
-	router.Use(gin.Logger())
+	router.Use(s.ZapLogger(s.logger))
 	router.MaxMultipartMemory = 32 << 20 // 32 mb
 
 	authHandler := auth.New(s.logger, s.db, s.cache)
