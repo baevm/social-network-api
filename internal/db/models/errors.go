@@ -16,8 +16,9 @@ var (
 	ErrGetFileFailed = errors.New("file delete has failed")
 
 	// Follow errors
-	ErrAlreadyFollowed = errors.New("already followed")
-	ErrNotFollowed     = errors.New("not followed")
+	ErrAlreadyFollowed      = errors.New("already followed")
+	ErrNotFollowed          = errors.New("not followed")
+	ErrCannotFollowYourself = errors.New("cannot follow yourself")
 
 	// Post errors
 	ErrAlreadyLiked = errors.New("already liked")

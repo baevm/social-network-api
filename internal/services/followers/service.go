@@ -24,6 +24,10 @@ func NewService(db *pgxpool.Pool) Service {
 }
 
 func (s *service) Follow(ctx context.Context, userId int64, followerId int64) error {
+	if userId == followerId {
+		return models.ErrCannotFollowYourself
+	}
+
 	follow := &models.Follow{
 		UserId:     userId,
 		FollowerId: followerId,
@@ -33,6 +37,10 @@ func (s *service) Follow(ctx context.Context, userId int64, followerId int64) er
 }
 
 func (s *service) Unfollow(ctx context.Context, userId int64, followerId int64) error {
+	if userId == followerId {
+		return models.ErrCannotFollowYourself
+	}
+
 	follow := &models.Follow{
 		UserId:     userId,
 		FollowerId: followerId,

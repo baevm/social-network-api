@@ -48,6 +48,9 @@ func (h *handler) Unfollow() gin.HandlerFunc {
 			case errors.Is(err, models.ErrNotFollowed):
 				h.payload.BadRequest(c, err)
 				return
+			case errors.Is(err, models.ErrCannotFollowYourself):
+				h.payload.BadRequest(c, err)
+				return
 			default:
 				h.payload.InternalServerError(c, err)
 				return
