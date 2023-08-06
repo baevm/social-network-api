@@ -42,7 +42,6 @@ func (s *Server) AuthSession() gin.HandlerFunc {
 
 func (s *Server) ZapLogger(logger *zap.SugaredLogger) gin.HandlerFunc {
 	return func(c *gin.Context) {
-
 		start := time.Now() // Start timer
 		path := c.Request.URL.Path
 		query := c.Request.URL.RawQuery
@@ -50,7 +49,6 @@ func (s *Server) ZapLogger(logger *zap.SugaredLogger) gin.HandlerFunc {
 		// Process request
 		c.Next()
 
-		// Fill the params
 		param := gin.LogFormatterParams{}
 
 		param.TimeStamp = time.Now() // Stop timer
@@ -59,7 +57,6 @@ func (s *Server) ZapLogger(logger *zap.SugaredLogger) gin.HandlerFunc {
 			param.Latency = param.Latency.Truncate(time.Second)
 		}
 
-		param.ClientIP = c.ClientIP()
 		param.Method = c.Request.Method
 		param.StatusCode = c.Writer.Status()
 		param.ErrorMessage = c.Errors.ByType(gin.ErrorTypePrivate).String()
@@ -69,27 +66,23 @@ func (s *Server) ZapLogger(logger *zap.SugaredLogger) gin.HandlerFunc {
 		}
 		param.Path = path
 
-		// fields := []zapcore.Field{
-		// 	zap.Int("status", c.Writer.Status()),
-		// 	zap.String("method", c.Request.Method),
-		// 	zap.String("path", path),
-		// 	zap.String("query", query),
-		// 	zap.String("ip", c.ClientIP()),
-		// 	zap.String("user-agent", c.Request.UserAgent()),
-		// 	zap.Duration("latency", param.Latency),
-		// }
-
 		if len(c.Errors) > 0 {
 			for _, e := range c.Errors.Errors() {
 				logger.Errorw(e,
-					"status", c.Writer.Status(),
-					"method", c.Request.Method,
+					"status", param.StatusCode,
+					"method", param.Method,
+					"path", param.Path,
+					"latency", param.Latency.String(),
+					"error", param.ErrorMessage,
 				)
 			}
 		} else {
-			logger.Infow(path,
-				"status", c.Writer.Status(),
-				"method", c.Request.Method)
+			logger.Infow("Request",
+				"status", param.StatusCode,
+				"method", param.Method,
+				"path", param.Path,
+				"latency", param.Latency.String(),
+			)
 		}
 	}
 }

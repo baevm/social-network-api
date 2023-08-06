@@ -32,7 +32,7 @@ func (s Server) Run() {
 	router := s.setHTTPRouter()
 
 	srv := &http.Server{
-		Addr:         "localhost:5000",
+		Addr:         "0.0.0.0:5000",
 		Handler:      router,
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,

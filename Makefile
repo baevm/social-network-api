@@ -42,7 +42,6 @@ vendor:
 .PHONY: build/api
 build/api:
 	@echo 'Building cmd/api'
-	GOOS=windows GOARCH=amd64 go build -ldflags='-s' -o=./bin ./cmd/api
 	GOOS=linux GOARCH=amd64 go build -ldflags='-s' -o=./bin ./cmd/api
 
 
@@ -84,4 +83,8 @@ swagger:
 #=============================================================================
 .PHONY: compose
 compose:
-	docker compose -f ./deploy/docker-compose.yml --env-file ./.env up
+	docker compose -f ./deploy/docker-compose.yml --env-file .env up
+
+.PHONY: docker/build
+docker/build:
+	docker build --no-cache -t social-network -f ./deploy/api/Dockerfile .

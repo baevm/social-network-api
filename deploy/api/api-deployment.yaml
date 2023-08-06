@@ -1,0 +1,27 @@
+apiVersion: apps/v1 
+kind: Deployment                                  # Type of the kubernetes resource
+metadata:
+  name: social-network-api                    # Name of the Kubernetes resource
+  labels:
+    app: social-network-api
+spec:
+  replicas: 1                                     # Number of pods to run at any given time
+  selector:
+    matchLabels: 
+      app: social-network-api                 # This deployment applies to any Pods matching the specified label
+  template:                                       # This deployment will create a set of pods using the configurations in this template
+    metadata:
+      labels:                                     # The labels that will be applied to all of the pods in this deployment
+        app: social-network-api
+    spec:                                         # Spec for the container which will run in the Pod
+      containers:
+      - name: social-network-api 
+        image: social-network:latest          # Local image
+        imagePullPolicy: Never                    # Never pull the image from a registry
+        ports:
+          - name: http
+            containerPort: 5000                   # Should match the port number that the Go application listens on
+        envFrom:
+          - secretRef:
+              name: api-secret               # Name of the secret environmental variable file to load
+        

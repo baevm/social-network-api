@@ -25,6 +25,20 @@ services:
     networks:
       - postgres
     restart: unless-stopped
+
+  api:
+    container_name: social-network-api
+    build:
+      context: ../
+      dockerfile: ./deploy/api/Dockerfile
+    environment:
+      - DB_DSN="postgres://postgres:123456@postgres/social-network?sslmode=disable"
+    ports:
+      - 5000:5000
+    networks:
+      - postgres
+    depends_on:
+      - postgres
   
   redis:
     container_name: social-network-redis

@@ -1,0 +1,13 @@
+apiVersion: v1                
+kind: Service                 
+metadata:
+  name: social-network-db    # Name of the resource
+  labels:                    # Labels that will be applied to the resource
+    app: social-network-db
+spec:
+  type: NodePort
+  ports:
+    - port: 5432
+  selector:               
+    app: social-network-db
+    tier: postgres
