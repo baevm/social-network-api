@@ -17,8 +17,8 @@ func (s *Server) setHTTPRouter() *gin.Engine {
 	router.Use(s.ZapLogger(s.logger))
 	router.MaxMultipartMemory = 32 << 20 // 32 mb
 
-	authHandler := auth.New(s.logger, s.db, s.cache)
-	usersHandler := users.New(s.logger, s.db, s.cache)
+	authHandler := auth.New(s.logger, s.db, s.cache, s.queue)
+	usersHandler := users.New(s.logger, s.db, s.cache, s.queue)
 	postsHandler := posts.New(s.logger, s.db, s.cache)
 	followHandler := followers.New(s.logger, s.db, s.cache)
 	feedHandler := feed.New(s.logger, s.db, s.cache)

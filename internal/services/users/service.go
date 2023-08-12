@@ -2,7 +2,9 @@ package users
 
 import (
 	"context"
+	"log"
 	"social-network-api/internal/db/models"
+	"social-network-api/internal/rabbitmq"
 	"social-network-api/internal/repository/users"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -18,11 +20,13 @@ type Service interface {
 
 type service struct {
 	userRepo *users.Repo
+	queue    rabbitmq.QueueProducer
 }
 
-func NewService(db *pgxpool.Pool) Service {
+func NewService(db *pgxpool.Pool, queue rabbitmq.QueueProducer) Service {
 	return &service{
 		userRepo: users.NewRepo(db),
+		queue:    queue,
 	}
 }
 
@@ -58,6 +62,15 @@ func (s *service) Create(ctx context.Context, user *models.User) error {
 	err = s.userRepo.Create(ctx, user)
 	if err != nil {
 		return err
+	}
+
+	err = s.queue.SendVerifyEmailTask(ctx, rabbitmq.VerifyEmailPayload{
+		Username: user.Username,
+		Email:    user.Email,
+	})
+
+	if err != nil {
+		log.Println(err)
 	}
 
 	return nil

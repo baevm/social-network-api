@@ -8,9 +8,11 @@ require (
 	github.com/go-playground/validator/v10 v10.13.0
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/jackc/pgx/v5 v5.3.1
+	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/ory/dockertest v3.3.5+incompatible
 	github.com/redis/go-redis/v9 v9.0.4
 	github.com/spf13/viper v1.15.0
+	github.com/streadway/amqp v1.1.0
 	github.com/stretchr/testify v1.8.2
 	github.com/swaggo/swag v1.16.1
 	go.uber.org/zap v1.24.0

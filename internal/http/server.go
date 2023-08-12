@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"social-network-api/internal/rabbitmq"
 	"social-network-api/internal/redis"
 	"syscall"
 	"time"
@@ -18,13 +19,15 @@ type Server struct {
 	logger *zap.SugaredLogger
 	db     *pgxpool.Pool
 	cache  *redis.Client
+	queue  rabbitmq.QueueProducer
 }
 
-func New(logger *zap.SugaredLogger, db *pgxpool.Pool, cache *redis.Client) *Server {
+func New(logger *zap.SugaredLogger, db *pgxpool.Pool, cache *redis.Client, queue rabbitmq.QueueProducer) *Server {
 	return &Server{
 		logger: logger,
 		db:     db,
 		cache:  cache,
+		queue:  queue,
 	}
 }
 

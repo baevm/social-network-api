@@ -22,12 +22,22 @@ type Config struct {
 		Pass string `mapstructure:"pass"`
 	} `mapstructure:"redis"`
 
+	RabbitMQ struct {
+		URL string `mapstructure:"url"`
+	} `mapstructure:"rabbitmq"`
+
 	Cloud struct {
 		Name   string `mapstructure:"CLOUDINARY_CLOUD_NAME"`
 		Key    string `mapstructure:"CLOUDINARY_API_KEY"`
 		Secret string `mapstructure:"CLOUDINARY_API_SECRET"`
 		Folder string `mapstructure:"CLOUDINARY_UPLOAD_FOLDER"`
 	} `mapstructure:"cloudinary"`
+
+	Email struct {
+		Name     string `mapstructure:"name"`
+		Address  string `mapstructure:"address"`
+		Password string `mapstructure:"password"`
+	} `mapstructure:"email"`
 }
 
 var cfg Config

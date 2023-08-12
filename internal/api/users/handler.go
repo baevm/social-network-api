@@ -1,6 +1,7 @@
 package users
 
 import (
+	"social-network-api/internal/rabbitmq"
 	"social-network-api/internal/redis"
 	"social-network-api/internal/services/users"
 	"social-network-api/pkg/payload"
@@ -22,11 +23,11 @@ type handler struct {
 	userService users.Service
 }
 
-func New(logger *zap.SugaredLogger, db *pgxpool.Pool, cache *redis.Client) Handler {
+func New(logger *zap.SugaredLogger, db *pgxpool.Pool, cache *redis.Client, queue rabbitmq.QueueProducer) Handler {
 	return &handler{
 		logger:      logger,
 		cache:       cache,
 		payload:     payload.New(logger),
-		userService: users.NewService(db),
+		userService: users.NewService(db, queue),
 	}
 }

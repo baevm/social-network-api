@@ -26,19 +26,19 @@ services:
       - postgres
     restart: unless-stopped
 
-  api:
-    container_name: social-network-api
-    build:
-      context: ../
-      dockerfile: ./deploy/api/Dockerfile
-    environment:
-      - DB_DSN="postgres://postgres:123456@postgres/social-network?sslmode=disable"
-    ports:
-      - 5000:5000
-    networks:
-      - postgres
-    depends_on:
-      - postgres
+  # api:
+  #   container_name: social-network-api
+  #   build:
+  #     context: ../
+  #     dockerfile: ./deploy/api/Dockerfile
+  #   environment:
+  #     - DB_DSN="postgres://postgres:123456@postgres/social-network?sslmode=disable"
+  #   ports:
+  #     - 5000:5000
+  #   networks:
+  #     - postgres
+  #   depends_on:
+  #     - postgres
   
   redis:
     container_name: social-network-redis
@@ -61,6 +61,17 @@ services:
     - "8081:8081"
     networks:
       - redis-network
+
+  queue:
+    container_name: rabbit-queue
+    image: rabbitmq:3-management
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ${HOME}/dev-rabbitmq/data/:/var/lib/rabbitmq
+      - ${HOME}/dev-rabbitmq/log/:/var/log/rabbitmq
+    restart: always
 
 networks:
   postgres:

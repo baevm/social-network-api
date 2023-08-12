@@ -4,8 +4,12 @@ import (
 	"social-network-api/cfg"
 	"social-network-api/internal/db"
 	"social-network-api/internal/http"
+	"social-network-api/internal/mail"
+	"social-network-api/internal/rabbitmq"
 	"social-network-api/internal/redis"
 	"social-network-api/pkg/logger"
+
+	"go.uber.org/zap"
 )
 
 // @title           Social network API
@@ -34,6 +38,26 @@ func main() {
 
 	defer cache.Close()
 
-	httpServer := http.New(logger, db, cache)
+	queue, err := rabbitmq.NewProducer(cfg.Get().RabbitMQ.URL)
+
+	if err != nil {
+		logger.Fatalf("Error starting queue: %s", err)
+	}
+
+	mailer := mail.NewEmailSender(cfg.Get().Email.Name, cfg.Get().Email.Address, cfg.Get().Email.Password)
+
+	go startRabbitConsumer(cfg.Get().RabbitMQ.URL, logger, mailer)
+
+	httpServer := http.New(logger, db, cache, queue)
 	httpServer.Run()
+}
+
+func startRabbitConsumer(url string, logger *zap.SugaredLogger, mailer mail.EmailSender) {
+	c, err := rabbitmq.NewConsumer(url, logger, mailer)
+
+	if err != nil {
+		logger.Errorln("Failed to start RabbitMQ consumer: ", err)
+	}
+
+	c.Start()
 }

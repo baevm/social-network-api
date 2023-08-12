@@ -13,3 +13,11 @@ cloudinary:
   CLOUDINARY_API_KEY: 666618811268123
   CLOUDINARY_API_SECRET: ixe22vA4qG2_0d9QWpQegBCUlvs
   CLOUDINARY_UPLOAD_FOLDER: go-social-network
+
+rabbitmq:
+  URL: amqp://guest:guest@localhost:5672/
+
+email:
+  name: 238b90ba12daf1
+  password: 6b55b27f95b86d
+  address: no-reply@social-network.com
