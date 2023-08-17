@@ -1,5 +1,3 @@
 ### To Do
-1. Distributed email sender
-2. Grafana + Prometheus metrics
-3. Tests
-4. Kubernetes
+1. Grafana + Prometheus metrics
+2. Tests

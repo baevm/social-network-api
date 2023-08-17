@@ -21,8 +21,8 @@ var (
 // @Accept       json
 // @Produce      json
 // @Param 		 Cookie header string true "auth_token" default(Bearer token)
-// @Param        id query string false "page"
-// @Param        id query string false "limit"
+// @Param        page query string false "page"
+// @Param        limit query string false "limit"
 // @Success      201  {object} []models.Post
 // @Failure      401,500,400  {object}  payload.HTTPError
 // @Router       /feed [get]

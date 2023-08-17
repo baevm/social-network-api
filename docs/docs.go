@@ -942,11 +942,6 @@ const docTemplate = `{
                 "avatar": {
                     "type": "string"
                 },
-                "birthdate": {
-                    "type": "string",
-                    "format": "date",
-                    "example": "2006-01-02"
-                },
                 "first_name": {
                     "type": "string"
                 },

@@ -120,10 +120,6 @@ definitions:
     properties:
       avatar:
         type: string
-      birthdate:
-        example: "2006-01-02"
-        format: date
-        type: string
       first_name:
         type: string
       id:

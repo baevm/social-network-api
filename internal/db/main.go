@@ -15,9 +15,9 @@ func New() (*pgxpool.Pool, error) {
 		return nil, err
 	}
 
-	dbConf.MaxConns = cfg.Get().DB_CFG.MaxOpenConn
-	dbConf.MinConns = cfg.Get().DB_CFG.MaxIdleConn
-	dbConf.MaxConnIdleTime = cfg.Get().DB_CFG.ConnMaxLifeTime * time.Minute
+	dbConf.MaxConns = cfg.Get().DB.MaxOpenConn
+	dbConf.MinConns = cfg.Get().DB.MaxIdleConn
+	dbConf.MaxConnIdleTime = cfg.Get().DB.ConnMaxLifeTime * time.Minute
 
 	db, err := pgxpool.New(context.Background(), cfg.Get().DB_DSN)
 

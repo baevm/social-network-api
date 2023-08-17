@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -31,11 +32,13 @@ func New(logger *zap.SugaredLogger, db *pgxpool.Pool, cache *redis.Client, queue
 	}
 }
 
-func (s Server) Run() {
+func (s Server) Run(host, port string) {
 	router := s.setHTTPRouter()
 
+	addr := fmt.Sprintf("%s:%s", host, port)
+
 	srv := &http.Server{
-		Addr:         "0.0.0.0:5000",
+		Addr:         addr,
 		Handler:      router,
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
@@ -58,13 +61,13 @@ func (s Server) Run() {
 		ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 		defer cancel()
 
+		s.logger.Infoln("Completing background tasks...")
+
 		err := srv.Shutdown(ctx)
 
 		if err != nil {
 			shutdownError <- err
 		}
-
-		s.logger.Infoln("Completing background tasks...")
 
 		shutdownError <- nil
 	}()

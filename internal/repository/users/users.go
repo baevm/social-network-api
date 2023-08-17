@@ -197,3 +197,30 @@ func (r Repo) GetById(ctx context.Context, id int64) (*models.User, error) {
 
 	return &user, nil
 }
+
+func (r Repo) CheckId(ctx context.Context, id int64) (*models.User, error) {
+	var user models.User
+
+	query := `
+	SELECT id, username
+	FROM users
+	WHERE id = $1`
+
+	err := r.DB.
+		QueryRow(ctx, query, id).
+		Scan(
+			&user.Id,
+			&user.Username,
+		)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, pgx.ErrNoRows):
+			return nil, models.ErrRecordNotFound
+		default:
+			return nil, err
+		}
+	}
+
+	return &user, nil
+}

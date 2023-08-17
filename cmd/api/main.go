@@ -49,7 +49,7 @@ func main() {
 	go startRabbitConsumer(cfg.Get().RabbitMQ.URL, logger, mailer)
 
 	httpServer := http.New(logger, db, cache, queue)
-	httpServer.Run()
+	httpServer.Run(cfg.Get().Server.Host, cfg.Get().Server.Port)
 }
 
 func startRabbitConsumer(url string, logger *zap.SugaredLogger, mailer mail.EmailSender) {

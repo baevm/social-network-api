@@ -8,9 +8,14 @@ import (
 )
 
 type Config struct {
+	Server struct {
+		Host string `mapstructure:"host"`
+		Port string `mapstructure:"port"`
+	} `mapstructure:"server"`
+
 	DB_DSN string `mapstructure:"DB_DSN"`
 
-	DB_CFG struct {
+	DB struct {
 		MaxOpenConn     int32         `mapstructure:"maxOpenConn"`
 		MaxIdleConn     int32         `mapstructure:"maxIdleConn"`
 		ConnMaxLifeTime time.Duration `mapstructure:"connMaxLifeTime"`

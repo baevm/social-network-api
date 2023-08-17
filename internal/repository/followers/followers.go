@@ -2,10 +2,8 @@ package followers
 
 import (
 	"context"
-	"errors"
 	"social-network-api/internal/db/models"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -26,12 +24,8 @@ func (r *Repo) Follow(ctx context.Context, follow *models.Follow) error {
 
 	ct, err := r.DB.Exec(ctx, query, args...)
 
-	if errors.Is(err, pgx.ErrNoRows) {
-		return models.ErrRecordNotFound
-	}
-
 	if ct.RowsAffected() == 0 {
-		return models.ErrRecordNotFound
+		return models.ErrAlreadyFollowed
 	}
 
 	return err
@@ -46,12 +40,8 @@ func (r *Repo) Unfollow(ctx context.Context, follow *models.Follow) error {
 
 	ct, err := r.DB.Exec(ctx, query, args...)
 
-	if errors.Is(err, pgx.ErrNoRows) {
-		return models.ErrRecordNotFound
-	}
-
 	if ct.RowsAffected() == 0 {
-		return models.ErrRecordNotFound
+		return models.ErrNotFollowed
 	}
 
 	return err
